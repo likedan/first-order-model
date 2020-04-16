@@ -104,13 +104,13 @@ def find_best_frame(source, driving, cpu=False):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--config", required=True, help="path to config")
-    parser.add_argument("--checkpoint", default='vox-cpk.pth.tar', help="path to checkpoint to restore")
+    parser.add_argument("--config", default="config/fashion-256.yaml", help="path to config")
+    parser.add_argument("--checkpoint", default='data/fashion.pth.tar', help="path to checkpoint to restore")
 
-    parser.add_argument("--source_image", default='sup-mat/source.png', help="path to source image")
-    parser.add_argument("--driving_video", default='sup-mat/source.png', help="path to driving video")
+    parser.add_argument("--source_image", default='data/farfetch-test2.jpg', help="path to source image")
+    parser.add_argument("--driving_video", default='data/ref-video.mp4', help="path to driving video")
     parser.add_argument("--result_video", default='result.mp4', help="path to output")
- 
+
     parser.add_argument("--relative", dest="relative", action="store_true", help="use relative or absolute keypoint coordinates")
     parser.add_argument("--adapt_scale", dest="adapt_scale", action="store_true", help="adapt movement scale based on convex hull of keypoints")
 

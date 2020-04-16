@@ -1,5 +1,5 @@
 import os
-from skimage import io, img_as_float32
+from skimage import io, img_as_float
 from skimage.color import gray2rgb
 from sklearn.model_selection import train_test_split
 from imageio import mimread
@@ -9,6 +9,9 @@ from torch.utils.data import Dataset
 import pandas as pd
 from augmentation import AllAugmentationTransform
 import glob
+import torchvision.transforms.functional as TF
+from torchvision import transforms
+import torch.nn.functional as F
 
 
 def read_video(name, frame_shape):
@@ -23,7 +26,7 @@ def read_video(name, frame_shape):
         frames = sorted(os.listdir(name))
         num_frames = len(frames)
         video_array = np.array(
-            [img_as_float32(io.imread(os.path.join(name, frames[idx]))) for idx in range(num_frames)])
+            [img_as_float(io.imread(os.path.join(name, frames[idx]))) for idx in range(num_frames)])
     elif name.lower().endswith('.png') or name.lower().endswith('.jpg'):
         image = io.imread(name)
 
@@ -33,19 +36,19 @@ def read_video(name, frame_shape):
         if image.shape[2] == 4:
             image = image[..., :3]
 
-        image = img_as_float32(image)
+        image = img_as_float(image)
 
         video_array = np.moveaxis(image, 1, 0)
 
         video_array = video_array.reshape((-1,) + frame_shape)
         video_array = np.moveaxis(video_array, 1, 2)
     elif name.lower().endswith('.gif') or name.lower().endswith('.mp4') or name.lower().endswith('.mov'):
-        video = np.array(mimread(name))
+        video = np.array(mimread(name, memtest=False))
         if len(video.shape) == 3:
             video = np.array([gray2rgb(frame) for frame in video])
         if video.shape[-1] == 4:
             video = video[..., :3]
-        video_array = img_as_float32(video)
+        video_array = img_as_float(video)
     else:
         raise Exception("Unknown file extensions  %s" % name)
 
@@ -94,6 +97,11 @@ class FramesDataset(Dataset):
         else:
             self.transform = None
 
+        self.resize_transform = transforms.Compose([
+            transforms.Resize((940, 720)),
+            transforms.ToTensor(),
+        ])
+
     def __len__(self):
         return len(self.videos)
 
@@ -111,7 +119,7 @@ class FramesDataset(Dataset):
             frames = os.listdir(path)
             num_frames = len(frames)
             frame_idx = np.sort(np.random.choice(num_frames, replace=True, size=2))
-            video_array = [img_as_float32(io.imread(os.path.join(path, frames[idx]))) for idx in frame_idx]
+            video_array = [img_as_float(io.imread(os.path.join(path, frames[idx]))) for idx in frame_idx]
         else:
             video_array = read_video(path, frame_shape=self.frame_shape)
             num_frames = len(video_array)
@@ -126,9 +134,8 @@ class FramesDataset(Dataset):
         if self.is_train:
             source = np.array(video_array[0], dtype='float32')
             driving = np.array(video_array[1], dtype='float32')
-
-            out['driving'] = driving.transpose((2, 0, 1))
-            out['source'] = source.transpose((2, 0, 1))
+            out['driving'] = F.interpolate(TF.to_tensor(driving).unsqueeze(0), size=(256, 256), mode='bilinear').squeeze(0)
+            out['source'] =  F.interpolate(TF.to_tensor(source).unsqueeze(0), size=(256, 256), mode='bilinear').squeeze(0)
         else:
             video = np.array(video_array, dtype='float32')
             out['video'] = video.transpose((3, 0, 1, 2))

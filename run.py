@@ -26,7 +26,7 @@ if __name__ == "__main__":
         raise Exception("You must use Python 3 or higher. Recommended version is Python 3.7")
 
     parser = ArgumentParser()
-    parser.add_argument("--config", required=True, help="path to config")
+    parser.add_argument("--config", default="config/fashion-256.yaml", help="path to config")
     parser.add_argument("--mode", default="train", choices=["train", "reconstruction", "animate"])
     parser.add_argument("--log_dir", default='log', help="path to log into")
     parser.add_argument("--checkpoint", default=None, help="path to checkpoint to restore")
