@@ -57,6 +57,7 @@ class OcclusionAwareGenerator(nn.Module):
         return F.grid_sample(inp, deformation)
 
     def forward(self, source_image, kp_driving, kp_source):
+
         # Encoding (downsampling) part
         out = self.first(source_image)
         for i in range(len(self.down_blocks)):
@@ -90,7 +91,7 @@ class OcclusionAwareGenerator(nn.Module):
         for i in range(len(self.up_blocks)):
             out = self.up_blocks[i](out)
         out = self.final(out)
-        out = F.sigmoid(out)
+        out = torch.sigmoid(out)
 
         output_dict["prediction"] = out
 

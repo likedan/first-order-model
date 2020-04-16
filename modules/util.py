@@ -6,7 +6,7 @@ import torch
 from sync_batchnorm import SynchronizedBatchNorm2d as BatchNorm2d
 
 
-def kp2gaussian(kp, spatial_size, kp_variance):
+def kp2gaussian(kp: object, spatial_size: object, kp_variance: object) -> object:
     """
     Transform a keypoint into gaussian like representation
     """
