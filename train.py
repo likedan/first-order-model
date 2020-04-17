@@ -16,7 +16,7 @@ warnings.filterwarnings("ignore")
 
 def train(config, generator, discriminator, kp_detector, checkpoint, log_dir, dataset, device_ids):
 
-    worker_num = 8
+    worker_num = 16
     train_params = config['train_params']
 
     optimizer_generator = torch.optim.Adam(generator.parameters(), lr=train_params['lr_generator'], betas=(0.5, 0.999))
