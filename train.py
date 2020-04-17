@@ -1,8 +1,8 @@
 from tqdm import trange, tqdm
 import torch
+import warnings
 
 from torch.utils.data import DataLoader
-
 from logger import Logger
 from modules.model import GeneratorFullModel, DiscriminatorFullModel
 
@@ -12,10 +12,11 @@ from sync_batchnorm import DataParallelWithCallback
 
 from frames_dataset import DatasetRepeater
 
+warnings.filterwarnings("ignore")
 
 def train(config, generator, discriminator, kp_detector, checkpoint, log_dir, dataset, device_ids):
 
-    worker_num = 0
+    worker_num = 8
     train_params = config['train_params']
 
     optimizer_generator = torch.optim.Adam(generator.parameters(), lr=train_params['lr_generator'], betas=(0.5, 0.999))
@@ -43,7 +44,7 @@ def train(config, generator, discriminator, kp_detector, checkpoint, log_dir, da
     generator_full = GeneratorFullModel(kp_detector, generator, discriminator, train_params)
     discriminator_full = DiscriminatorFullModel(kp_detector, generator, discriminator, train_params)
 
-    if torch.cuda.is_available():
+    if torch.cuda.ivisus_available():
         generator_full = DataParallelWithCallback(generator_full, device_ids=device_ids)
         discriminator_full = DataParallelWithCallback(discriminator_full, device_ids=device_ids)
 

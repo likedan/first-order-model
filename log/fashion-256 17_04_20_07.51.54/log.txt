@@ -1,0 +1,2 @@
+00000000) perceptual - 115.83960; gen_gan - 0.53293; feature_matching - 6.36755; equivariance_value - 0.33626; equivariance_jacobian - 0.85692; disc_gan - 0.34975
+00000001) perceptual - 103.93315; gen_gan - 0.68368; feature_matching - 6.39921; equivariance_value - 0.28817; equivariance_jacobian - 0.81198; disc_gan - 0.19294
